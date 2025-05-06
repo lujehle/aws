@@ -46,9 +46,15 @@ async function loadStations(url) {
         iconAnchor: [16, 32],
         popupAnchor: [0, -32]
     });
+    console.log(jsondata);
+
     L.geoJSON(jsondata, {
-        pointToLayer: function (feature, latlng) {
+        pointToLayer: function (feature, latlng) { //feature ist einzelne Station
+            const name = feature.properties.name || "Unbenannt";
+            const elevation = feature.properties.coordinates[2] || "?";
+
     }
+}).addTo(overlays.stations);
 
 }
 
