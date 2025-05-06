@@ -46,7 +46,9 @@ async function loadStations(url) {
         iconAnchor: [16, 32],
         popupAnchor: [0, -32]
     });
-
+    L.geoJSON(jsondata, {
+        pointToLayer: function (feature, latlng) {
+    }
 
 }
 
