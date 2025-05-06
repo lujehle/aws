@@ -50,11 +50,13 @@ async function loadStations(url) {
 
     L.geoJSON(jsondata, {
         pointToLayer: function (feature, latlng) { //feature ist einzelne Station
-            const name = feature.properties.name || "Unbenannt";
-            const elevation = feature.properties.coordinates[2] || "?";
+            const name = feature.properties.name
+            const elevation = feature.geometry.coordinates[2]
 
-    }
-}).addTo(overlays.stations);
+            const popup = `<h4>${name} (${elevation}m)</h4>`;
+            return L.marker(latlng, { icon: awsIcon }).bindPopup(popup);
+        }
+    }).addTo(overlays.stations);
 
 }
 
