@@ -35,10 +35,19 @@ L.control.scale({
 
 // Wetterstationen
 async function loadStations(url) {
+
     let response = await fetch(url);
     let jsondata = await response.json();
 
     // Wetterstationen mit Icons und Popups
+    const awsIcon = L.icon({
+        iconUrl: "icons/wifi.png",
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32]
+    });
+
 
 }
+
 loadStations("https://static.avalanche.report/weather_stations/stations.geojson");
