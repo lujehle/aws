@@ -12,7 +12,8 @@ let map = L.map("map").setView([ibk.lat, ibk.lng], ibk.zoom);
 
 // thematische Layer
 let overlays = {
-    stations: L.featureGroup().addTo(map),
+    stations: L.featureGroup(),
+    temperature: L.featureGroup().addTo(map)
 }
 
 // Layer control
@@ -26,6 +27,7 @@ L.control.layers({
     "Esri WorldImagery": L.tileLayer.provider("Esri.WorldImagery"),
 }, {
     "Wetterstationen": overlays.stations,
+    "Temperatur": overlays.temperature,
 }).addTo(map);
 
 // Maßstab
@@ -35,7 +37,6 @@ L.control.scale({
 
 // Wetterstationen
 async function loadStations(url) {
-
     let response = await fetch(url);
     let jsondata = await response.json();
 
@@ -46,18 +47,49 @@ async function loadStations(url) {
         iconAnchor: [16, 32],
         popupAnchor: [0, -32]
     });
-    console.log(jsondata);
-
+    
     L.geoJSON(jsondata, {
-        pointToLayer: function (feature, latlng) { //feature ist einzelne Station
-            const name = feature.properties.name
-            const elevation = feature.geometry.coordinates[2]
+        pointToLayer: function (feature, latlng) {
+            return L.marker(
+                latlng, {
+                icon: awsIcon
+            }
 
-            const popup = `<h4>${name} (${elevation}m)</h4>`;
-            return L.marker(latlng, { icon: awsIcon }).bindPopup(popup);
+            )
+        },
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup(`
+                <h4>${feature.properties.name} (${feature.geometry.coordinates[2]}m)</h4>
+                <ul>
+                    <li>Lufttemperatur (C) ${feature.properties.LT !== undefined ? feature.properties.LT : "-"}</li>
+                    <li> Relative Luftfeuchte (%) ${feature.properties.HR}</li>
+                    <li> Windgeschwindigkeit (km/h) ${feature.properties.WG}</li>
+                    <li> Schneehöhe (cm) ${feature.properties.HS}</li>
+                    </ul>
+                    <span>$</span>
+                    `);
         }
-    }).addTo(overlays.stations);
-
+    }).addTo(overlays.stations)
+    showTemperature(jsondata);
 }
-
 loadStations("https://static.avalanche.report/weather_stations/stations.geojson");
+
+function showTemperature(jsondata) {
+    L.geoJSON(jsondata, {
+    filter: function(feature){
+        if (feature.properties.LT > -50 && feature.properties.LT < 50){
+            return true;
+        }
+
+    },
+        pointToLayer: function(feature, latlng){
+            return L.marker(latlng,{
+                icon: L.divIcon({
+                    html: `<span>${feature.properties.LT}</span>`,
+                    className: "aws-div-icon",
+                }),
+            })
+        }
+
+    }).addTo(overlays.temperature);
+}
