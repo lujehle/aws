@@ -13,7 +13,8 @@ let map = L.map("map").setView([ibk.lat, ibk.lng], ibk.zoom);
 // thematische Layer
 let overlays = {
     stations: L.featureGroup(),
-    temperature: L.featureGroup().addTo(map)
+    temperature: L.featureGroup().addTo(map),
+    wind: L.featureGroup().addTo(map)
 }
 
 // Layer control
@@ -28,6 +29,7 @@ L.control.layers({
 }, {
     "Wetterstationen": overlays.stations,
     "Temperatur": overlays.temperature,
+    "Wind": overlays.wind
 }).addTo(map);
 
 // Maßstab
@@ -71,35 +73,61 @@ async function loadStations(url) {
         }
     }).addTo(overlays.stations)
     showTemperature(jsondata);
+    showWind(jsondata)
 }
 loadStations("https://static.avalanche.report/weather_stations/stations.geojson");
 
 function showTemperature(jsondata) {
     L.geoJSON(jsondata, {
-    filter: function(feature){
-        if (feature.properties.LT > -50 && feature.properties.LT < 50){
-            return true;
-        }
-
-    },
-        pointToLayer: function(feature, latlng){
+        filter: function (feature) {
+            return feature.properties.LT > -50 && feature.properties.LT < 50;
+        },
+        pointToLayer: function (feature, latlng) {
             let color = getColor(feature.properties.LT, COLORS.temperature);
-            return L.marker(latlng,{
+            return L.marker(latlng, {
                 icon: L.divIcon({
-                    html: `<span style="background-color:${color}">${feature.properties.LT}</span>`,
-                    className: "aws-div-icon",
-                }),
-            })
+                    html: `<span style="background-color:${color}">${feature.properties.LT.toFixed(1)}°C</span>`,
+                    className: "aws-div-icon"
+                })
+            });
         }
-
     }).addTo(overlays.temperature);
 }
-
-function getColor(value, ramp ){
+function getColor(value, ramp) {
     for (let rule of ramp) {
-        if (value >= rule.min && value < rule.max){
-            return rule.color
+        if (value >= rule.min && value < rule.max) {
+            return rule.color;
         }
     }
 
 }
+
+function showWind(jsondata) {
+    L.geoJSON(jsondata, {
+        filter: function (feature) {
+            return feature.properties.WG !== undefined && feature.properties.WG >= 0;
+        },
+        pointToLayer: function (feature, latlng) {
+            let color = getColor(feature.properties.WG, COLORS.wind);
+            return L.marker(latlng, {
+                icon: L.divIcon({
+                    html: `<span style="background-color:${color}">${feature.properties.WG.toFixed(1)} km/h</span>`,
+                    className: "aws-div-icon-wind"
+                })
+            });
+        }
+    }).addTo(overlays.wind);
+}
+function getWindColor(value, ramp) {
+    for (let rule of ramp) {
+        if (value >= rule.min && value < rule.max) {
+            return rule.color;
+        }
+    }
+
+}
+let testedColor = getWindColor(5, COLORS.wind);
+console.log("TestColor for temp 5", testedColor)
+
+
+
