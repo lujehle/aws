@@ -83,13 +83,23 @@ function showTemperature(jsondata) {
 
     },
         pointToLayer: function(feature, latlng){
+            let color = getColor(feature.properties.LT, COLORS.temperature);
             return L.marker(latlng,{
                 icon: L.divIcon({
-                    html: `<span>${feature.properties.LT}</span>`,
+                    html: `<span style="background-color:${color}">${feature.properties.LT}</span>`,
                     className: "aws-div-icon",
                 }),
             })
         }
 
     }).addTo(overlays.temperature);
+}
+
+function getColor(value, ramp ){
+    for (let rule of ramp) {
+        if (value >= rule.min && value < rule.max){
+            return rule.color
+        }
+    }
+
 }
