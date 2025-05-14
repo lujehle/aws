@@ -10,9 +10,9 @@ let ibk = {
 // Karte initialisieren
 let map = L.map("map").setView([ibk.lat, ibk.lng], ibk.zoom);
 
-// thematische Layer
+// thematische Layer als feature group, groups sind noch leer
 let overlays = {
-    stations: L.featureGroup(),
+    stations: L.featureGroup(), //Stationen beim aufrufen der Seite noch nicht sichtbar
     temperature: L.featureGroup().addTo(map),
     wind: L.featureGroup().addTo(map)
 }
@@ -40,7 +40,7 @@ L.control.scale({
 // Wetterstationen
 async function loadStations(url) {
     let response = await fetch(url);
-    let jsondata = await response.json();
+    let jsondata = await response.json(); //in json data umwandeln
 
     // Wetterstationen mit Icons und Popups
     const awsIcon = L.icon({
@@ -50,17 +50,19 @@ async function loadStations(url) {
         popupAnchor: [0, -32]
     });
     
-    L.geoJSON(jsondata, {
+    L.geoJSON(jsondata, { //Verarbeitet GeoJSON-Daten und erstellt Leaflet-Layer, jsondata GeoJSON-Objekt (z. B. Punktdaten, Linien, Polygone)
         pointToLayer: function (feature, latlng) {
-            return L.marker(
+            return L.marker(   //marker wird an Position latlng gesetzt
                 latlng, {
                 icon: awsIcon
             }
 
             )
         },
+        //popup gestaltung für wetterstationen
         onEachFeature: function (feature, layer) {
-            layer.bindPopup(`
+            //bindet popup fenster an marker, darunter werden inhalte gefüllt
+            layer.bindPopup(` 
                 <h4>${feature.properties.name} (${feature.geometry.coordinates[2]}m)</h4>
                 <ul>
                     <li>Lufttemperatur (C) ${feature.properties.LT !== undefined ? feature.properties.LT : "-"}</li>
@@ -71,7 +73,7 @@ async function loadStations(url) {
                     <span>$</span>
                     `);
         }
-    }).addTo(overlays.stations)
+    }).addTo(overlays.stations) //fügt alle Marker mit popups zu stations feature group hinzu
     showTemperature(jsondata);
     showWind(jsondata)
 }
@@ -79,7 +81,7 @@ loadStations("https://static.avalanche.report/weather_stations/stations.geojson"
 
 function showTemperature(jsondata) {
     L.geoJSON(jsondata, {
-        filter: function (feature) {
+        filter: function (feature) { //Temperatur (LT) muss zwischen –50 und +50 °C liegen
             return feature.properties.LT > -50 && feature.properties.LT < 50;
         },
         pointToLayer: function (feature, latlng) {
