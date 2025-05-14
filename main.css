@@ -82,3 +82,12 @@ footer nav {
     font-size: 0.8rem;
     font-weight: bold;
 }
+
+.aws-div-icon-direction {
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+}
