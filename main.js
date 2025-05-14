@@ -9,7 +9,18 @@ let ibk = {
 
 // Karte initialisieren
 let map = L.map("map").setView([ibk.lat, ibk.lng], ibk.zoom);
-
+    // Change default options
+    L.control.rainviewer({ 
+        position: 'bottomleft',
+        nextButtonText: '>',
+        playStopButtonText: 'Play/Stop',
+        prevButtonText: '<',
+        positionSliderLabelText: "Hour:",
+        opacitySliderLabelText: "Opacity:",
+        animationInterval: 500,
+        opacity: 0.5
+    }).addTo(map);
+    
 // thematische Layer als feature group, groups sind noch leer
 let overlays = {
     stations: L.featureGroup(), //Stationen beim aufrufen der Seite noch nicht sichtbar
