@@ -84,7 +84,7 @@ async function loadStations(url) {
 loadStations("https://static.avalanche.report/weather_stations/stations.geojson");
 
 
-function showsnow(jsondata) {
+function showSnow(jsondata) {
     L.geoJSON(jsondata, {
         filter: function (feature) { 
             return feature.properties.HS !== undefined && feature.properties.HS >= 0;
@@ -98,7 +98,7 @@ function showsnow(jsondata) {
                 })
             });
         }
-    }).addTo(overlays.temperature);
+    }).addTo(overlays.snow);
 }
 
 function showTemperature(jsondata) {
