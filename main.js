@@ -15,7 +15,8 @@ let overlays = {
     stations: L.featureGroup(), //Stationen beim aufrufen der Seite noch nicht sichtbar
     temperature: L.featureGroup().addTo(map),
     wind: L.featureGroup().addTo(map),
-    snow: L.featureGroup().addTo(map)
+    snow: L.featureGroup().addTo(map),
+    direction: L.featureGroup().addTo(map)
 }
 
 // Layer control
@@ -31,7 +32,8 @@ L.control.layers({
     "Wetterstationen": overlays.stations,
     "Temperatur": overlays.temperature,
     "Wind": overlays.wind,
-    "Schnee":overlays.snow
+    "Schnee": overlays.snow,
+    "Windrichtung": overlays.winddir
 
 }).addTo(map);
 
@@ -52,7 +54,7 @@ async function loadStations(url) {
         iconAnchor: [16, 32],
         popupAnchor: [0, -32]
     });
-    
+
     L.geoJSON(jsondata, { //Verarbeitet GeoJSON-Daten und erstellt Leaflet-Layer, jsondata GeoJSON-Objekt (z. B. Punktdaten, Linien, Polygone)
         pointToLayer: function (feature, latlng) {
             return L.marker(   //marker wird an Position latlng gesetzt
@@ -79,14 +81,35 @@ async function loadStations(url) {
     }).addTo(overlays.stations) //fügt alle Marker mit popups zu stations feature group hinzu
     showTemperature(jsondata);
     showWind(jsondata);
-    showSnow(jsondata)
+    showSnow(jsondata);
+    showWinddir(jsondata)
 }
 loadStations("https://static.avalanche.report/weather_stations/stations.geojson");
+
+function showWinddir(jsondata) {
+    L.geoJSON(jsondata, {
+        filter: function (feature) {
+            return feature.properties.WR !== undefined && feature.properties.WG !== undefined && feature.properties.WR >= 0 && feature.properties.WG >= 0;
+        },
+        pointToLayer: function (feature, latlng) {
+            let windSpeed = feature.properties.WG;
+            let windDirection = feature.properties.WR;
+            let color = getColor(windSpeed, COLORS.wind);
+            let directionText = `${windDirection}°`;
+            return L.marker(latlng, {
+                icon: L.divIcon({
+                    html: `<span style="background-color:${color}">${directionText}</span>`,
+                    className: "aws-div-icon-direction"
+                })
+            });
+        }
+    }).addTo(overlays.winddir);
+}
 
 
 function showSnow(jsondata) {
     L.geoJSON(jsondata, {
-        filter: function (feature) { 
+        filter: function (feature) {
             return feature.properties.HS !== undefined && feature.properties.HS >= 0;
         },
         pointToLayer: function (feature, latlng) {
