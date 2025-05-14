@@ -14,7 +14,8 @@ let map = L.map("map").setView([ibk.lat, ibk.lng], ibk.zoom);
 let overlays = {
     stations: L.featureGroup(), //Stationen beim aufrufen der Seite noch nicht sichtbar
     temperature: L.featureGroup().addTo(map),
-    wind: L.featureGroup().addTo(map)
+    wind: L.featureGroup().addTo(map),
+    snow: L.featureGroup().addTo(map)
 }
 
 // Layer control
@@ -29,7 +30,9 @@ L.control.layers({
 }, {
     "Wetterstationen": overlays.stations,
     "Temperatur": overlays.temperature,
-    "Wind": overlays.wind
+    "Wind": overlays.wind,
+    "Schnee":overlays.snow
+
 }).addTo(map);
 
 // Maßstab
@@ -75,9 +78,28 @@ async function loadStations(url) {
         }
     }).addTo(overlays.stations) //fügt alle Marker mit popups zu stations feature group hinzu
     showTemperature(jsondata);
-    showWind(jsondata)
+    showWind(jsondata);
+    showSnow(jsondata)
 }
 loadStations("https://static.avalanche.report/weather_stations/stations.geojson");
+
+
+function showsnow(jsondata) {
+    L.geoJSON(jsondata, {
+        filter: function (feature) { 
+            return feature.properties.HS !== undefined && feature.properties.HS >= 0;
+        },
+        pointToLayer: function (feature, latlng) {
+            let color = getColor(feature.properties.HS, COLORS.snow);
+            return L.marker(latlng, {
+                icon: L.divIcon({
+                    html: `<span style="background-color:${color}">${feature.properties.HS.toFixed(1)}cm</span>`,
+                    className: "aws-div-icon-snow"
+                })
+            });
+        }
+    }).addTo(overlays.temperature);
+}
 
 function showTemperature(jsondata) {
     L.geoJSON(jsondata, {
