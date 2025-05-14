@@ -95,10 +95,10 @@ function showWinddir(jsondata) {
             let windSpeed = feature.properties.WG;
             let windDirection = feature.properties.WR;
             let color = getColor(windSpeed, COLORS.wind);
-            let directionText = `${windDirection}°`;
+            let directionwind = `${windDirection}°`;
             return L.marker(latlng, {
                 icon: L.divIcon({
-                    html: `<span style="background-color:${color}">${directionText}</span>`,
+                    html: `<span style="background-color:${color}">${directionwind}</span>`, //color beenhaltet Hintergrundfarbe aus windspeed, directionwind in Grad
                     className: "aws-div-icon-direction"
                 })
             });
