@@ -82,7 +82,7 @@ async function loadStations(url) {
             layer.bindPopup(` 
                 <h4>${feature.properties.name} (${feature.geometry.coordinates[2]}m)</h4>
                 <ul>
-                    <li>Lufttemperatur (C) ${feature.properties.LT !== undefined ? feature.properties.LT : "-"}</li>
+                    <li>Lufttemperatur ${feature.properties.LT !== undefined ? feature.properties.LT.toFixed(1) : "-"} (°C)</li>
                     <li> Relative Luftfeuchte (%) ${feature.properties.HR}</li>
                     <li> Windgeschwindigkeit (km/h) ${feature.properties.WG}</li>
                     <li> Schneehöhe (cm) ${feature.properties.HS}</li>
@@ -112,7 +112,7 @@ function showWinddir(jsondata) {
             let directionwind = `${windDirection}°`;
             return L.marker(latlng, {
                 icon: L.divIcon({
-                    html: `<span style="background-color:${color}">${directionwind}</span>`, //color beenhaltet Hintergrundfarbe aus windspeed, directionwind in Grad
+                    html: `<span ><i style="transform:rotate(${feature.properties.WR}deg);color:${color}"class = "fa-solid fa-circle-arrow-down"></i></span>`, //color beenhaltet Hintergrundfarbe aus windspeed, directionwind in Grad
                     className: "aws-div-icon-direction"
                 })
             });
