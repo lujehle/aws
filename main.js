@@ -9,18 +9,8 @@ let ibk = {
 
 // Karte initialisieren
 let map = L.map("map").setView([ibk.lat, ibk.lng], ibk.zoom);
-    // Change default options
-    L.control.rainviewer({ 
-        position: 'bottomleft',
-        nextButtonText: '>',
-        playStopButtonText: 'Play/Stop',
-        prevButtonText: '<',
-        positionSliderLabelText: "Hour:",
-        opacitySliderLabelText: "Opacity:",
-        animationInterval: 500,
-        opacity: 0.5
-    }).addTo(map);
-    
+
+
 // thematische Layer als feature group, groups sind noch leer
 let overlays = {
     stations: L.featureGroup(), //Stationen beim aufrufen der Seite noch nicht sichtbar
@@ -47,7 +37,17 @@ L.control.layers({
     "Windrichtung": overlays.winddir
 
 }).addTo(map);
-
+    // Change default options
+    L.control.rainviewer({ 
+        position: 'bottomleft',
+        nextButtonText: '>',
+        playStopButtonText: 'Play/Stop',
+        prevButtonText: '<',
+        positionSliderLabelText: "Hour:",
+        opacitySliderLabelText: "Opacity:",
+        animationInterval: 500,
+        opacity: 0.5
+    }).addTo(map);
 // Maßstab
 L.control.scale({
     imperial: false,
@@ -96,6 +96,8 @@ async function loadStations(url) {
     showWinddir(jsondata)
 }
 loadStations("https://static.avalanche.report/weather_stations/stations.geojson");
+
+
 
 function showWinddir(jsondata) {
     L.geoJSON(jsondata, {
@@ -186,6 +188,5 @@ function getWindColor(value, ramp) {
 }
 let testedColor = getWindColor(5, COLORS.wind);
 console.log("TestColor for temp 5", testedColor)
-
 
 
